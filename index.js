@@ -115,6 +115,23 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/user-food', verifyToken, async (req, res) => {
+            console.log(req.query.email);
+            // console.log('token: ', req.cookies.token);
+            console.log('user in the valid token:', req.user);
+            if (req.query.email !== req.user.email) {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+
+            let query = {};
+            if (req.query?.email) {
+                query = { madeBy: req.query.email };
+            }
+            const result = await foodItemsCollection.find(query).toArray();
+            console.log('my food:', result);
+            res.send(result);
+        })
+
         app.get('/food-menu/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
@@ -130,6 +147,29 @@ async function run() {
         app.post('/purchase-item', async (req, res) => {
             const foodItem = req.body;
             const result = await purchaseItemsCollection.insertOne(foodItem);
+            res.send(result);
+        })
+
+        app.get('/purchase-item', verifyToken, async (req, res) => {
+            console.log(req.query.email);
+            // console.log('token: ', req.cookies.token);
+            console.log('user in the valid token:', req.user);
+            if (req.query.email !== req.user.email) {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query.email };
+            }
+            const result = await purchaseItemsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        app.delete('/purchase-item/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            result = await purchaseItemsCollection.deleteOne(query);
             res.send(result);
         })
 
