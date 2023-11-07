@@ -144,6 +144,37 @@ async function run() {
             res.send(result);
         })
 
+        app.put('/food-menu/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedItem = req.body;
+            const item = {
+                $set: {
+                    foodName: updatedItem.foodName,
+                    foodImage: updatedItem.foodImage,
+                    foodCategory: updatedItem.foodCategory,
+                    price: updatedItem.price,
+                    madeBy: updatedItem.madeBy,
+                    foodOrigin: updatedItem.foodOrigin,
+                    shortDescription: updatedItem.shortDescription,
+                    quantity: updatedItem.quantity,
+                    orders: updatedItem.orders
+                }
+            }
+            console.log(item);
+
+            const result = await foodItemsCollection.updateOne(filter, item, options);
+            res.send(result);
+        })
+
+        app.delete('/food-menu/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            result = await foodItemsCollection.deleteOne(query);
+            res.send(result);
+        })
+
         app.post('/purchase-item', async (req, res) => {
             const foodItem = req.body;
             const result = await purchaseItemsCollection.insertOne(foodItem);
