@@ -13,6 +13,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
         'https://elysium-5dc18.web.app',
+        'https://elysium-5dc18.firebaseapp.com/',
     ],
     credentials: true
 }))
