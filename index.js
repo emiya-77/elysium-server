@@ -155,6 +155,7 @@ async function run() {
                     foodImage: updatedItem.foodImage,
                     foodCategory: updatedItem.foodCategory,
                     price: updatedItem.price,
+                    addBy: updatedItem.addBy,
                     madeBy: updatedItem.madeBy,
                     foodOrigin: updatedItem.foodOrigin,
                     shortDescription: updatedItem.shortDescription,
@@ -172,6 +173,29 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             result = await foodItemsCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        app.patch('/food-menu/:id/increment', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const incrementValue = Number(req.body.incrementValue);
+            const decQuantity = Number(req.body.food_quantity);
+            const updateDoc = {
+                $inc: { orders: incrementValue, quantity: -decQuantity }
+            }
+            const result = await foodItemsCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+        app.get('/top-items', async (req, res) => {
+            const pipeline = [
+                { $sort: { orders: -1 } },
+                { $limit: 6 },
+                { $project: { _id: 1, foodName: 1, foodImage: 1, foodCategory: 1, price: 1, orders: 1 } },
+            ];
+
+            const result = await foodItemsCollection.aggregate(pipeline).toArray();
             res.send(result);
         })
 
