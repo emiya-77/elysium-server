@@ -12,6 +12,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
     origin: [
         'http://localhost:5173',
+        'https://elysium-5dc18.web.app',
     ],
     credentials: true
 }))
@@ -73,7 +74,8 @@ async function run() {
 
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: false
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             }).send({ success: true });
         })
 
@@ -81,7 +83,9 @@ async function run() {
             const user = req.body;
             console.log('logging out:', user);
             res.clearCookie('token', {
-                maxAge: 0
+                maxAge: 0,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             }).send({ success: true });
         })
 
@@ -122,7 +126,7 @@ async function run() {
 
             let query = {};
             if (req.query?.email) {
-                query = { madeBy: req.query.email };
+                query = { addBy: req.query.email };
             }
             const result = await foodItemsCollection.find(query).toArray();
             console.log('my food:', result);
@@ -198,6 +202,7 @@ async function run() {
 
         app.post('/purchase-item', async (req, res) => {
             const foodItem = req.body;
+            console.log('pur:', foodItem);
             const result = await purchaseItemsCollection.insertOne(foodItem);
             res.send(result);
         })
