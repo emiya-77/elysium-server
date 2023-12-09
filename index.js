@@ -151,6 +151,7 @@ async function run() {
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
             const updatedItem = req.body;
+            updatedItem.quantity = parseInt(updatedItem.quantity, 10);
             const item = {
                 $set: {
                     foodName: updatedItem.foodName,
@@ -233,6 +234,7 @@ async function run() {
 
         app.post('/add-item', async (req, res) => {
             const item = req.body;
+            item.quantity = parseInt(item.quantity, 10);
             console.log(item);
             const result = await foodItemsCollection.insertOne(item);
             res.send(result);
